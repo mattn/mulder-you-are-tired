@@ -47,29 +47,26 @@ func (m *mulder) Take(n int) *mulder {
 
 func (m *mulder) Tired() (r string) {
 	m.Shuffle().WorkUntil(func() {
+		sm := mulder{}
 		for _, s := range *m.Take(2) {
-			t := ""
-			if rand.Int()%2 == 0 {
-				sm := mulder{}
-				rs := []rune(s)
-				for _, rc := range rs {
-					sm = append(sm, string(rc))
-				}
-				rw := int(math.Ceil(float64(len(rs)) / 2))
-				a := *sm.Take(rw)
-				b := *sm.Take(rw)
-				if rw == 1 {
-					t += b[0] + a[0]
-				} else {
-					t += b[0] + a[1] + a[0] + b[1]
-				}
-			} else {
-				t += s
-			}
-			if r == "" {
-				t += "、"
-			}
-			r += t
+			sm = append(sm, s)
+		}
+
+		ss := mulder{}
+		for _, s := range sm {
+			rs := []rune(s)
+			rw := int(math.Ceil(float64(len(rs)) / 2))
+			ss = append(ss, string(rs[:rw]))
+			ss = append(ss, string(rs[rw:]))
+		}
+		rs := *(&ss).Take(4)
+		if rand.Int()%2 == 0 {
+			rs[0], rs[1], rs[2], rs[3] = rs[2], rs[1], rs[0], rs[3]
+		}
+		if r == "" {
+			r += rs[0] + rs[1] + "、" + rs[2] + rs[3]
+		} else {
+			r += rs[0] + rs[1] + rs[2] + rs[3]
 		}
 	})
 	return r
